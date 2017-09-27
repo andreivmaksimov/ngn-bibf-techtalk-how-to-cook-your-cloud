@@ -1,0 +1,51 @@
+---
+- hosts: webserver
+  become: true
+
+  vars:
+    http_port: 80
+    domain: www.ngn-demo.avmaksimov.ru
+
+  tasks:
+    - name: Update repositories cache
+      apt: update_cache=yes
+
+    - name: install packages
+      apt: name={{ item }} state=latest
+      with_items:
+        - apache2
+        - git
+
+    - name: enabled mod_rewrite
+      apache2_module: name=rewrite state=present
+      notify:
+        - restart apache2
+
+    - name: apache2 listen on port {{ http_port }}
+      lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen " line="Listen {{ http_port }}" state=present
+      notify:
+        - restart apache2
+
+    - name: apache2 virtualhost on port {{ http_port }}
+      lineinfile: dest=/etc/apache2/sites-available/000-default.conf regexp="^<VirtualHost \*:" line="<VirtualHost *:{{ http_port }}>"
+      notify:
+        - restart apache2
+
+    - name: create virtual host file
+      template: src=virtualhost.conf dest=/etc/apache2/sites-available/{{ domain }}.conf
+
+    - name: a2ensite {{ domain }}
+      command: a2ensite {{ domain }}
+      args:
+        creates: /etc/apache2/sites-enabled/{{ domain }}.conf
+      notify:
+        - restart apache2
+
+    - name: clone basic html template
+      git: repo=https://github.com/do-community/ansible-apache-tutorial.git dest=/var/www/{{ domain }}
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
+
+
