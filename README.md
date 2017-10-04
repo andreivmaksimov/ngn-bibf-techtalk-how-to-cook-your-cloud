@@ -3,7 +3,7 @@
 </p>
 This is code examples for "How to cook your cloud, have free time and save money" TechTalk at Bahrain. 
 
-Slides are available here at [SlideShare](https://www.slideshare.net/andreimaksimov3/how-to-cook-your-cloud-have-free-time-and-save-money)
+Slides are available at [SlideShare](https://www.slideshare.net/andreimaksimov3/how-to-cook-your-cloud-have-free-time-and-save-money)
 
 All you need is to clone this repository, install Terraform and Ansible and play with this examples:
 
