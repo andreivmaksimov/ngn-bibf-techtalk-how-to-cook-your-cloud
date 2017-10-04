@@ -15,11 +15,11 @@ resource "aws_instance" "web" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get update",
-      "test -e /usr/bin/python || (sudo apt install -y python-minimal)"
+      "test -e /usr/bin/python || (sudo add-apt-repository -y ppa:fkrull/deadsnakes && sudo apt-get update && sudo apt-get install -y python2.7)",
+      "sudo ln -s /usr/bin/python2.7 /usr/bin/python"
     ]
   }
   provisioner "local-exec" {
-    command = "sleep 5 && echo \"[webserver]\n${aws_instance.web.public_ip} ansible_connection=ssh ansible_ssh_user=ubuntu\" > ansible/inventory &&  ansible-playbook -i ansible/inventory ansible/playbook.yml"
+    command = "echo \"[webserver]\n${aws_instance.web.public_ip} ansible_connection=ssh ansible_ssh_user=ubuntu\" > ansible/inventory &&  ansible-playbook -i ansible/inventory ansible/playbook.yml"
   }
 }
